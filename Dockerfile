@@ -5,7 +5,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     OUTPUT_DIR=/workspace/output \
     PYTHONPATH=/workspace \
-    WAN_GPU_COUNT=0
+    WAN_GPU_COUNT=0 \
+    HF_HUB_DISABLE_XET=1
 
 WORKDIR /workspace
 
