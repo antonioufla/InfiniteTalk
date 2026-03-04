@@ -1,5 +1,5 @@
 # InfiniteTalk - RunPod Serverless
-# Updated: 2026-03-04 - fix: add misaki (dep do kokoro/KPipeline)
+# Updated: 2026-03-04 - fix: misaki[en] + espeak-ng | endpoint timeout: 1200s
 FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
 
 ENV DEBIAN_FRONTEND=noninteractive \
