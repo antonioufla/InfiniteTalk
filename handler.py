@@ -1,6 +1,7 @@
-import runpod
 import os
-os.environ["HF_HUB_DISABLE_XET"] = "1"  # desabilita protocolo XET instavel
+os.environ["HF_HUB_DISABLE_XET"] = "1"  # desabilita protocolo XET instavel - deve ser ANTES de qualquer import
+
+import runpod
 import time
 import requests
 import subprocess
