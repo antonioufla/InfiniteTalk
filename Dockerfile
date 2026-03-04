@@ -1,4 +1,5 @@
 # InfiniteTalk - RunPod Serverless
+# Updated: 2026-03-04 - fix: add misaki (dep do kokoro/KPipeline)
 FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -11,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 WORKDIR /workspace
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git ffmpeg libgl1-mesa-glx libglib2.0-0 wget curl git-lfs \
+    git ffmpeg libgl1-mesa-glx libglib2.0-0 wget curl git-lfs espeak-ng \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /workspace
@@ -34,7 +35,8 @@ RUN pip install --upgrade pip && \
     "numpy>=1.23.5,<2" \
     pyloudnorm optimum-quanto==0.2.6 \
     scenedetect moviepy==1.0.3 decord \
-    einops sentencepiece librosa soundfile && \
+    einops sentencepiece librosa soundfile \
+    "misaki[en]" && \
     pip install --no-cache-dir --no-deps xfuser>=0.4.1 && \
     pip install --no-cache-dir --no-deps yunchang distvae && \
     pip install --no-cache-dir --no-deps xformers==0.0.29.post3 \
