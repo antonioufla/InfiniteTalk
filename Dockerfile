@@ -45,14 +45,7 @@ RUN pip install --upgrade pip && \
       --index-url https://download.pytorch.org/whl/cu124 && \
     pip install --no-cache-dir "numpy>=1.23.5,<2"
 
-# Baixar pesos
-RUN mkdir -p weights && \
-    huggingface-cli download Wan-AI/Wan2.1-I2V-14B-480P \
-      --local-dir weights/Wan2.1-I2V-14B-480P && \
-    huggingface-cli download TencentGameMate/chinese-wav2vec2-base \
-      --local-dir weights/chinese-wav2vec2-base && \
-    huggingface-cli download MeiGen-AI/InfiniteTalk \
-      --local-dir weights/InfiniteTalk \
-      --include "single/infinitetalk.safetensors"
+# Baixar pesos no runtime (evita timeout no build)
+# Models serão baixados no handler.py na primeira execução
 
 CMD ["python", "-u", "handler.py"]
