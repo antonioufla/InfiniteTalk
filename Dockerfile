@@ -1,5 +1,6 @@
 # InfiniteTalk - RunPod Serverless
-# Updated: 2026-03-05 - fix: ordem correta torch→xformers→flash-attn + wheel pré-compilada
+# Updated: 2026-03-05 - fix: build < 30 min (remover flash-attn lento + torch reinstall)
+# flash-attn é OPCIONAL: wan/modules/attention.py tem fallback para torch SDPA
 FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -20,24 +21,18 @@ COPY . /workspace
 # Corrigir compatibilidade Python 3.11
 RUN sed -i "s/from inspect import ArgSpec/# from inspect import ArgSpec  # Python 3.11 fix/" wan/multitalk.py 2>/dev/null || true
 
-# PASSO 1 — Garantir torch 2.6.0+cu124 ANTES de qualquer extensão CUDA
-# (base image já vem com 2.6.0; reinstalamos para garantir caso deps abaixo alterem)
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir \
-    torch==2.6.0+cu124 torchvision==0.21.0+cu124 torchaudio==2.6.0+cu124 \
-    --index-url https://download.pytorch.org/whl/cu124
+# Base image já tem torch==2.6.0+cu124 — NÃO reinstalar (economiza ~4 min)
 
-# PASSO 2 — Instalar xformers (wheel pré-compilada para torch 2.6.0+cu124)
-RUN pip install --no-cache-dir --no-deps xformers==0.0.29.post3 \
+# xformers: wheel pré-compilada do PyTorch index (~43 MB, rápido)
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir --no-deps xformers==0.0.29.post3 \
       --index-url https://download.pytorch.org/whl/cu124
 
-# PASSO 3 — Instalar flash-attn com wheel pré-compilada (evita ~30 min de compilação CUDA)
-# Wheel: Python 3.11 + CUDA 12 + Torch 2.6, sem cxx11-abi
-RUN pip install --no-cache-dir ninja psutil packaging wheel && \
-    pip install --no-cache-dir \
-      "flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl"
+# flash-attn: PULADO — download de GitHub leva ~50 min (timeout de build é 30 min)
+# O código já tem fallback automático para torch.nn.functional.scaled_dot_product_attention
+# (ver wan/modules/attention.py linhas 157-188)
 
-# PASSO 4 — Instalar demais dependências Python
+# Dependências Python
 RUN pip install --no-cache-dir \
     runpod==1.6.2 \
     huggingface_hub \
@@ -55,12 +50,7 @@ RUN pip install --no-cache-dir \
     einops sentencepiece librosa soundfile \
     "misaki[en]" && \
     pip install --no-cache-dir --no-deps "xfuser>=0.4.1" && \
-    pip install --no-cache-dir --no-deps yunchang distvae
-
-# PASSO 5 — Re-pinnar torch (caso alguma dep acima tenha alterado)
-RUN pip install --no-cache-dir --force-reinstall \
-    torch==2.6.0+cu124 torchvision==0.21.0+cu124 torchaudio==2.6.0+cu124 \
-    --index-url https://download.pytorch.org/whl/cu124 && \
+    pip install --no-cache-dir --no-deps yunchang distvae && \
     pip install --no-cache-dir "numpy>=1.23.5,<2"
 
 # Baixar pesos no runtime (evita timeout no build)
