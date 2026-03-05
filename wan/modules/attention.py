@@ -13,14 +13,20 @@ import xformers.ops
 try:
     import flash_attn_interface
     FLASH_ATTN_3_AVAILABLE = True
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError) as e:
     FLASH_ATTN_3_AVAILABLE = False
+    if 'No module named' not in str(e):
+        import warnings as _w
+        _w.warn(f'flash_attn_interface installed but failed to import: {e}')
 
 try:
     import flash_attn
     FLASH_ATTN_2_AVAILABLE = True
-except ModuleNotFoundError:
+except (ImportError, ModuleNotFoundError) as e:
     FLASH_ATTN_2_AVAILABLE = False
+    if 'No module named' not in str(e):
+        import warnings as _w
+        _w.warn(f'flash_attn is installed but failed to import: {e}. Falling back to native PyTorch attention.')
 
 import warnings
 
