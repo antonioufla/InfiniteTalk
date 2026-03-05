@@ -112,7 +112,7 @@ def handler(job):
             "python3", "generate_infinitetalk.py",
             "--ckpt_dir", str(WEIGHTS_DIR / "Wan2.1-I2V-14B-480P"),
             "--wav2vec_dir", str(WEIGHTS_DIR / "chinese-wav2vec2-base"),
-            "--infinitetalk_dir", str(WEIGHTS_DIR / "InfiniteTalk" / "single"),
+            "--infinitetalk_dir", str(WEIGHTS_DIR / "InfiniteTalk" / "single" / "infinitetalk.safetensors"),
             "--audio_save_dir", str(tmp_dir / "save_audio"),
             "--input_json", str(json_path),
             "--save_file", str(tmp_dir / "result"),
