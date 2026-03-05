@@ -32,10 +32,10 @@ RUN pip install --no-cache-dir --no-deps xformers==0.0.29.post3 \
       --index-url https://download.pytorch.org/whl/cu124
 
 # PASSO 3 — Instalar flash-attn com wheel pré-compilada (evita ~30 min de compilação CUDA)
-# Wheel: Python 3.11 + CUDA 12.4 + Torch 2.6, sem cxx11-abi
+# Wheel: Python 3.11 + CUDA 12 + Torch 2.6, sem cxx11-abi
 RUN pip install --no-cache-dir ninja psutil packaging wheel && \
     pip install --no-cache-dir \
-      "flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu124torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl"
+      "flash-attn @ https://github.com/Dao-AILab/flash-attention/releases/download/v2.7.4.post1/flash_attn-2.7.4.post1+cu12torch2.6cxx11abiFALSE-cp311-cp311-linux_x86_64.whl"
 
 # PASSO 4 — Instalar demais dependências Python
 RUN pip install --no-cache-dir \
