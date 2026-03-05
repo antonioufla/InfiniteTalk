@@ -68,6 +68,7 @@ def download_file(url: str, dest: Path) -> Path:
 
 
 def handler(job):
+    print("[InfiniteTalk] handler v2 - save_file/cond_video fix ativo (2026-03-05)")
     # Baixar models na primeira execução
     download_models()
     
