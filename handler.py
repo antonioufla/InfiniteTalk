@@ -68,7 +68,7 @@ def download_file(url: str, dest: Path) -> Path:
 
 
 def handler(job):
-    print("[InfiniteTalk] handler v2 - save_file/cond_video fix ativo (2026-03-05)")
+    print("[InfiniteTalk] handler v3 - streaming mode for full audio length (2026-03-05)")
     # Baixar models na primeira execução
     download_models()
     
@@ -118,6 +118,8 @@ def handler(job):
             "--save_file", str(tmp_dir / "result"),
             "--task", "infinitetalk-14B",
             "--size", "infinitetalk-480",
+            "--mode", "streaming",
+            "--max_frame_num", "1000",
         ]
 
         proc = subprocess.run(cmd, capture_output=True, text=True, cwd=str(WORKSPACE))
