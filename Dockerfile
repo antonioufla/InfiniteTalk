@@ -28,9 +28,10 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir --no-deps xformers==0.0.29.post3 \
       --index-url https://download.pytorch.org/whl/cu124
 
-# flash-attn: PULADO — download de GitHub leva ~50 min (timeout de build é 30 min)
-# O código já tem fallback automático para torch.nn.functional.scaled_dot_product_attention
-# (ver wan/modules/attention.py linhas 157-188)
+# flash-attn: wheel pré-compilada do PyPI (torch 2.6, cu124, Python 3.11)
+# Muito mais rápido que compilar do source — ~2 min de download em vez de 50 min
+RUN pip install --no-cache-dir flash-attn --no-build-isolation 2>/dev/null || \
+    echo "WARN: flash-attn install failed, will use SDPA fallback"
 
 # Dependências Python
 RUN pip install --no-cache-dir \
