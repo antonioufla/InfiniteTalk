@@ -117,8 +117,7 @@ def flash_attention(
             softmax_scale=softmax_scale,
             causal=causal,
             deterministic=deterministic)[0].unflatten(0, (b, lq))
-    else:
-        assert FLASH_ATTN_2_AVAILABLE
+    elif FLASH_ATTN_2_AVAILABLE:
         x = flash_attn.flash_attn_varlen_func(
             q=q,
             k=k,
@@ -134,6 +133,23 @@ def flash_attention(
             causal=causal,
             window_size=window_size,
             deterministic=deterministic).unflatten(0, (b, lq))
+    else:
+        # Fallback: PyTorch native SDPA (no flash-attn needed)
+        warnings.warn(
+            'Flash attention 2/3 not available, using PyTorch SDPA fallback. '
+            'This may be slower but is functionally equivalent.'
+        )
+        # q,k,v are flattened: [B*Lq, Nq, C] -> reshape to [B, Nq, Lq, C] for SDPA
+        q_sdpa = q.unflatten(0, (b, lq)).transpose(1, 2)  # [B, Nq, Lq, C]
+        k_sdpa = k.unflatten(0, (b, lk)).transpose(1, 2)  # [B, Nk, Lk, C]
+        v_sdpa = v.unflatten(0, (b, lk)).transpose(1, 2)  # [B, Nk, Lk, C]
+        x = torch.nn.functional.scaled_dot_product_attention(
+            q_sdpa, k_sdpa, v_sdpa,
+            dropout_p=dropout_p,
+            is_causal=causal,
+            scale=softmax_scale,
+        )  # [B, Nq, Lq, C]
+        x = x.transpose(1, 2)  # [B, Lq, Nq, C]
 
     # output
     return x.type(out_dtype)
