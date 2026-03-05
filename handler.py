@@ -92,11 +92,13 @@ def handler(job):
         print(f"[InfiniteTalk] Baixando áudio: {audio_url}")
         audio_path = download_file(audio_url, tmp_dir / "input.wav")
 
-        # Criar JSON de input
+        # Criar JSON de input no formato esperado por generate_infinitetalk.py
         input_json = {
-            "image": str(image_path),
-            "audio": str(audio_path),
             "prompt": prompt,
+            "cond_video": str(image_path),
+            "cond_audio": {
+                "person1": str(audio_path)
+            },
         }
         json_path = tmp_dir / "input.json"
         with open(json_path, "w") as f:
@@ -109,9 +111,10 @@ def handler(job):
             "python3", "generate_infinitetalk.py",
             "--ckpt_dir", str(WEIGHTS_DIR / "Wan2.1-I2V-14B-480P"),
             "--wav2vec_dir", str(WEIGHTS_DIR / "chinese-wav2vec2-base"),
-            "--infinitetalk_dir", str(WEIGHTS_DIR / "InfiniteTalk" / "single" / "infinitetalk.safetensors"),
+            "--infinitetalk_dir", str(WEIGHTS_DIR / "InfiniteTalk" / "single"),
+            "--audio_save_dir", str(tmp_dir / "save_audio"),
             "--input_json", str(json_path),
-            "--output_dir", str(tmp_dir),
+            "--save_file", str(tmp_dir / "result"),
             "--task", "infinitetalk-14B",
             "--size", "infinitetalk-480",
         ]
