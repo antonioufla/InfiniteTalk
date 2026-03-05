@@ -1,6 +1,6 @@
 # InfiniteTalk - RunPod Serverless
-# Updated: 2026-03-04 - fix: misaki[en] + espeak-ng | endpoint timeout: 1200s
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel
+# Updated: 2026-03-05 - fix: upgrade torch 2.6.0 (CVE-2025-32434 + xformers compat)
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -44,7 +44,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir ninja psutil packaging wheel && \
     pip install --no-cache-dir flash-attn==2.7.4.post1 --no-build-isolation && \
     pip install --no-cache-dir --force-reinstall \
-      torch==2.5.1+cu124 torchvision==0.20.1+cu124 torchaudio==2.5.1+cu124 \
+      torch==2.6.0+cu124 torchvision==0.21.0+cu124 torchaudio==2.6.0+cu124 \
       --index-url https://download.pytorch.org/whl/cu124 && \
     pip install --no-cache-dir "numpy>=1.23.5,<2"
 
